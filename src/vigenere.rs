@@ -1,4 +1,6 @@
-use std::collections::HashSet;
+use crate::common::Cipher;
+
+use super::common::check_unique;
 
 pub struct Vigenere {
     alphabet: String,
@@ -6,15 +8,10 @@ pub struct Vigenere {
 }
 impl Vigenere {
     pub fn new(alphabet: &'static str, keystream: &'static str) -> Result<Self, String> {
-        let char_set: HashSet<char> = alphabet.chars().collect();
-        if char_set.len() != alphabet.chars().count() {
-            return Err(String::from("Duplicate characters found in alphabet!"));
-        }
-
-        if !keystream.chars().all(|c| char_set.contains(&c)) {
+        check_unique(alphabet).unwrap();
+        if !keystream.chars().all(|c| alphabet.contains(c)) {
             return Err(String::from("Keyword contains invalid characters!"));
         }
-
         Ok(Vigenere {
             alphabet: alphabet.to_string(),
             keystream: keystream.to_string(),
@@ -46,10 +43,12 @@ impl Vigenere {
         }
         result
     }
-    pub fn encrypt(&self, plaintext: &str) -> String {
+}
+impl Cipher for Vigenere {
+    fn encrypt(&self, plaintext: &str) -> String {
         self.substitute(plaintext, false)
     }
-    pub fn decrypt(&self, ciphertext: &str) -> String {
+    fn decrypt(&self, ciphertext: &str) -> String {
         self.substitute(ciphertext, true)
     }
 }
@@ -57,14 +56,14 @@ impl Vigenere {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const KRYPTOS: &str = "KRYPTOSABCDEFGHIJLMNQUVWXZ";
+    use crate::common::KRYPTOS;
 
     #[test]
     fn kryptos_k1() {
         let plaintext = "BETWEENSUBTLESHADINGANDTHEABSENCEOFLIGHT";
         let ciphertxt = "EMUFPHZLRFAXYUSDJKZLDKRNSHGNFIVJYQTQUXQB";
 
-        let vigenere = Vigenere::new(KRYPTOS, "PALIMPSEST").unwrap();
+        let vigenere = Vigenere::new(&KRYPTOS, "PALIMPSEST").unwrap();
         assert_eq!(vigenere.encrypt(plaintext), ciphertxt);
         assert_eq!(vigenere.decrypt(ciphertxt), plaintext);
     }
@@ -73,7 +72,7 @@ mod tests {
         let plaintext = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?";
         let ciphertxt = "VFPJUDEEHZWETZYVGWHKKQETGFQJNCE GGWHKK?";
 
-        let vigenere = Vigenere::new(KRYPTOS, "ABSCISSA").unwrap();
+        let vigenere = Vigenere::new(&KRYPTOS, "ABSCISSA").unwrap();
         let encrypted = vigenere.encrypt(plaintext);
         assert_eq!(encrypted.replace(" ", ""), ciphertxt.replace(" ", ""));
         let decrypted = vigenere.decrypt(ciphertxt);

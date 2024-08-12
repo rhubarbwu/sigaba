@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use super::common::{check_unique, Cipher, ENGLISH};
 use std::convert::TryInto;
 
 pub struct Caesar {
@@ -9,12 +9,7 @@ pub struct Caesar {
 
 impl Caesar {
     pub fn new(alphabet: &'static str, offset: u32) -> Result<Self, String> {
-        let char_set: HashSet<char> = alphabet.chars().collect();
-        if char_set.len() != alphabet.chars().count() {
-            println!("{}", alphabet.len());
-            return Err(String::from("Duplicate characters found in alphabet!"));
-        }
-
+        check_unique(alphabet).unwrap();
         let len = <usize as TryInto<u32>>::try_into(alphabet.len()).unwrap();
         Ok(Caesar {
             alphabet: alphabet.to_string(),
@@ -22,6 +17,10 @@ impl Caesar {
             offset: offset % len,
         })
     }
+    pub fn new_rot13() -> Result<Self, String> {
+        Caesar::new(ENGLISH, 13)
+    }
+
     fn substitute(&self, input: &str, offset: u32) -> String {
         let mut output = String::new();
         let alphabet_chars: Vec<char> = self.alphabet.chars().collect();
@@ -36,10 +35,12 @@ impl Caesar {
         }
         output
     }
-    pub fn encrypt(&self, plaintext: &str) -> String {
+}
+impl Cipher for Caesar {
+    fn encrypt(&self, plaintext: &str) -> String {
         self.substitute(plaintext, self.offset)
     }
-    pub fn decrypt(&self, ciphertext: &str) -> String {
+    fn decrypt(&self, ciphertext: &str) -> String {
         self.substitute(ciphertext, self.alphalen - self.offset)
     }
 }
@@ -48,12 +49,10 @@ impl Caesar {
 mod tests {
     use super::*;
 
-    const ALPHABET: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     #[test]
     fn stasis() {
         let plaintext = "I CAME, I SAW, I CONQUERED.";
-        let caesar = Caesar::new(ALPHABET, 0).unwrap();
+        let caesar = Caesar::new(&ENGLISH, 0).unwrap();
         assert_eq!(caesar.encrypt(plaintext), plaintext);
         assert_eq!(caesar.decrypt(plaintext), plaintext);
     }
@@ -61,15 +60,23 @@ mod tests {
     fn shift2() {
         let plaintext = "THE die IS CAST."; // case-sensitive!
         let ciphertxt = "VJG die KU ECUV.";
-        let caesar = Caesar::new("ABCDEFGHIJKLMNOPQRSTUVXYZ", 2).unwrap();
+        let caesar = Caesar::new(&ENGLISH, 2).unwrap();
         assert_eq!(caesar.encrypt(plaintext), ciphertxt);
         assert_eq!(caesar.decrypt(ciphertxt), plaintext);
+    }
+    #[test]
+    fn rot_13() {
+        let plaintext = "THIS IS A SPOILER";
+        let ciphertxt = "GUVF VF N FCBVYRE";
+        let rot13 = Caesar::new_rot13().unwrap();
+        assert_eq!(rot13.encrypt(plaintext), ciphertxt);
+        assert_eq!(rot13.decrypt(ciphertxt), plaintext);
     }
     #[test]
     fn wrap27() {
         let plaintext = "ET TU, brute?"; // case-sensitive!
         let ciphertxt = "FU UV, brute?";
-        let caesar = Caesar::new(ALPHABET, 27).unwrap();
+        let caesar = Caesar::new(&ENGLISH, 27).unwrap();
         assert_eq!(caesar.encrypt(plaintext), ciphertxt);
         assert_eq!(caesar.decrypt(ciphertxt), plaintext);
     }
