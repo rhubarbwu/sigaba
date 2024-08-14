@@ -1,4 +1,4 @@
 pub mod common;
 
-pub mod caesar;
+pub mod affine;
 pub mod vigenere;
