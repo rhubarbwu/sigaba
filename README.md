@@ -35,5 +35,5 @@
 ### Vigenère
 
 - [x] Vigenère (+Variant Beaufort) (c. 1553)
-- [ ] Beaufort (c. 17th century)
+- [x] Beaufort (c. 17th century)
 - [ ] Autokey (c. 1855)
