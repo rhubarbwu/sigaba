@@ -6,13 +6,10 @@
 - [ ] Nicodemus (c. 17th century)
 - [ ] Grandpre (c. 17th century)
 - [ ] Playfair (c. 1854)
-- [ ] Grille (c. 19th century)
 - [ ] Nihilist (c. 19th century)
-- [ ] Rail Fence (c. 19th century)
 - [ ] Book (c. 19th century)
 - [ ] One-Time Pad (c. 1917)
 - [ ] Hill (c. 1929)
-- [ ] Route Transposition (c. 20th century)
 - [ ] Four Square (c. 20th century)
 - [ ] Pollux (c. 20th century)
 - [ ] Syllabary (c. 20th century)
@@ -31,9 +28,12 @@
 
 - [ ] Scytale (c. 400 BC)
 - [ ] Columnar (c. 1880)
+- [ ] Grille (c. 19th century)
+- [ ] Rail Fence (c. 19th century)
+- [ ] Route (c. 20th century)
 
 ### Vigenère
 
 - [x] Vigenère (+Variant Beaufort) (c. 1553)
 - [x] Beaufort (c. 17th century)
-- [ ] Autokey (c. 1855)
+- [x] Autokey (c. 1855)

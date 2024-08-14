@@ -34,7 +34,7 @@ impl Affine {
         Affine::new(alphabet, 1, shift)
     }
     pub fn new_rot13() -> Result<Self, String> {
-        Affine::new(ENGLISH, 1, 13)
+        Affine::new(&ENGLISH, 1, 13)
     }
 
     fn substitute(&self, text: &str, decrypt: bool) -> String {
