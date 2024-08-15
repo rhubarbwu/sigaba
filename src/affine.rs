@@ -1,19 +1,18 @@
-use super::common::{check_unique, mult_inv, Cipher, ENGLISH};
+use super::common::{check_unique, filter, mult_inv, refill, Cipher, ENGLISH};
 
 #[derive(Debug)]
 pub struct Affine {
     alphabet: String,
-    alphalen: i32,
-    factor: i32,
-    facinv: i32,
-    offset: i32,
+    alphalen: usize,
+    factor: isize,
+    facinv: isize,
+    offset: isize,
 }
 
 impl Affine {
-    pub fn new(alphabet: &str, factor: i32, offset: i32) -> Result<Self, String> {
+    pub fn new(alphabet: &str, factor: isize, offset: isize) -> Result<Self, String> {
         check_unique(alphabet).unwrap();
-        let len = <usize as TryInto<i32>>::try_into(alphabet.len()).unwrap();
-
+        let len = <usize as TryInto<isize>>::try_into(alphabet.len()).unwrap();
         let (factor, facinv) = match mult_inv(factor, len) {
             Ok(fi) => (factor, fi),
             Err(_) => (1, 1),
@@ -21,7 +20,7 @@ impl Affine {
 
         Ok(Self {
             alphabet: alphabet.to_string(),
-            alphalen: len,
+            alphalen: alphabet.len(),
             factor,
             facinv,
             offset,
@@ -30,28 +29,24 @@ impl Affine {
     pub fn new_atbash(alphabet: &str) -> Result<Self, String> {
         Self::new(alphabet, -1, -1)
     }
-    pub fn new_caesar(alphabet: &str, shift: i32) -> Result<Self, String> {
+    pub fn new_caesar(alphabet: &str, shift: isize) -> Result<Self, String> {
         Self::new(alphabet, 1, shift)
     }
     pub fn new_rot13() -> Result<Self, String> {
         Self::new(&ENGLISH, 1, 13)
     }
 
-    fn substitute(&self, text: &str, decrypt: bool) -> String {
-        let mut output = String::new();
-        let alphabet_chars: Vec<char> = self.alphabet.chars().collect();
-        for c in text.chars() {
-            if let Some(pos) = alphabet_chars.iter().position(|&x| x == c) {
-                let new_pos = match decrypt {
-                    false => self.factor * pos as i32 + self.offset + self.alphalen,
-                    true => self.facinv * (self.alphalen + pos as i32 - self.offset),
-                } % self.alphalen;
-                output.push(alphabet_chars[new_pos as usize]);
-            } else {
-                output.push(c);
-            }
+    fn substitute(&self, input: &str, decrypt: bool) -> String {
+        let mut output = String::with_capacity(input.len());
+        for c in filter(input, &self.alphabet).chars() {
+            let idx = self.alphabet.chars().position(|x| x == c).unwrap();
+            let new_idx = match decrypt {
+                false => self.factor * idx as isize + self.offset + self.alphalen as isize,
+                true => self.facinv * (self.alphalen as isize + idx as isize - self.offset),
+            } % self.alphalen as isize;
+            output.push(self.alphabet.chars().nth(new_idx as usize).unwrap());
         }
-        output
+        refill(&output, input, &self.alphabet)
     }
 }
 impl Cipher for Affine {

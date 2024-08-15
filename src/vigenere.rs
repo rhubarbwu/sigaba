@@ -1,8 +1,9 @@
-use crate::common::{check_unique, Cipher};
+use crate::common::{check_unique, filter, refill, Cipher};
 
 #[derive(Debug)]
 pub struct Vigenere {
     alphabet: String,
+    alphalen: usize,
     keystream: String,
     beaufort: bool,
 }
@@ -14,6 +15,7 @@ impl Vigenere {
         }
         Ok(Self {
             alphabet: alphabet.to_string(),
+            alphalen: alphabet.len(),
             keystream: keystream.to_string(),
             beaufort: false,
         })
@@ -25,31 +27,22 @@ impl Vigenere {
         })
     }
 
-    fn get_index(&self, c: char) -> Option<usize> {
-        self.alphabet.chars().position(|x| x == c)
-    }
-    fn substitute(&self, text: &str, decrypt: bool) -> String {
+    fn substitute(&self, input: &str, decrypt: bool) -> String {
+        let mut output = String::with_capacity(input.len());
         let (mut kw_idx, kw_len) = (0, self.keystream.len());
-        let mut result = String::new();
-
-        for c in text.chars() {
-            if let Some(txt_idx) = self.get_index(c) {
-                let kw_char = self.keystream.chars().nth(kw_idx).unwrap();
-                let (ab_len, ab_idx) = (self.alphabet.len(), self.get_index(kw_char).unwrap());
-
-                let new_idx = match (self.beaufort, decrypt) {
-                    (true, _) => (ab_len + ab_idx - txt_idx) % ab_len,
-                    (_, false) => (txt_idx + ab_idx) % ab_len,
-                    (_, true) => (txt_idx + ab_len - ab_idx) % ab_len,
-                };
-                result.push(self.alphabet.chars().nth(new_idx).unwrap());
-
-                kw_idx = (kw_idx + 1) % kw_len;
-            } else {
-                result.push(c);
-            }
+        for c in filter(input, &self.alphabet).chars() {
+            let txt_idx = self.alphabet.chars().position(|x| x == c).unwrap();
+            let kw_char = self.keystream.chars().nth(kw_idx).unwrap();
+            let ab_idx = self.alphabet.chars().position(|x| x == kw_char).unwrap();
+            let new_idx = match (self.beaufort, decrypt) {
+                (true, _) => (self.alphalen + ab_idx - txt_idx) % self.alphalen,
+                (_, false) => (txt_idx + ab_idx) % self.alphalen,
+                (_, true) => (txt_idx + self.alphalen - ab_idx) % self.alphalen,
+            };
+            output.push(self.alphabet.chars().nth(new_idx).unwrap());
+            kw_idx = (kw_idx + 1) % kw_len;
         }
-        result
+        refill(&output, input, &self.alphabet)
     }
 }
 impl Cipher for Vigenere {

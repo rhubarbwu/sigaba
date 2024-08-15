@@ -1,4 +1,4 @@
-use crate::common::Cipher;
+use crate::common::{filter, refill, Cipher};
 use crate::vigenere::Vigenere;
 
 #[derive(Debug)]
@@ -21,44 +21,29 @@ impl AutoKey {
     }
 
     fn parallelize(&self, input: &str) -> String {
-        let filtered: String = input
-            .chars()
-            .filter(|c| self.alphabet.contains(*c))
-            .collect();
-        let keystream = self.primer.to_owned() + &filtered;
+        let keystream = self.primer.to_owned() + &filter(input, &self.alphabet);
         let vig = Vigenere::new(&self.alphabet, &keystream).unwrap();
         match self.autoregressive {
             false => vig.encrypt(&input),
             true => vig.decrypt(&input),
         }
     }
-
     fn autoregress(&self, input: &str) -> String {
-        let mut key = self.primer.to_string();
+        let input_filtered = filter(input, &self.alphabet);
         let mut output = String::new();
-        let (input_len, chunk_size) = (input.len(), self.primer.len());
+        let mut key = self.primer.to_string();
+        let (input_len, chunk_size) = (input_filtered.len(), self.primer.len());
         for i in (0..input_len).step_by(chunk_size) {
-            let chunk = &input[i..std::cmp::min(i + chunk_size, input_len)];
-            if !chunk.chars().any(|c| self.alphabet.contains(c)) {
-                output.push_str(&chunk);
-                continue;
-            }
-
+            let chunk = &input_filtered[i..std::cmp::min(i + chunk_size, input_len)];
             let vig = Vigenere::new(&self.alphabet, &key).unwrap();
             let substitute = match self.autoregressive {
                 false => vig.decrypt(&chunk),
                 true => vig.encrypt(&chunk),
             };
             output.push_str(&substitute);
-
-            let filtered: String = substitute
-                .chars()
-                .filter(|c| self.alphabet.contains(*c))
-                .collect();
-            key.push_str(&filtered);
-            key.drain(..filtered.len());
+            key = substitute;
         }
-        output
+        refill(&output, input, &self.alphabet)
     }
 }
 
