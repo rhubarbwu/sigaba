@@ -13,7 +13,7 @@ impl AutoKey {
         if !primer.chars().all(|c| alphabet.contains(c)) {
             return Err(String::from("Keyword contains invalid characters!"));
         }
-        Ok(AutoKey {
+        Ok(Self {
             alphabet: alphabet.to_string(),
             primer: primer.to_string(),
             autoregressive,
@@ -82,21 +82,21 @@ mod tests {
     use super::*;
     use crate::common::ENGLISH;
 
+    const STRATEGY: &str = "ATTACK AT DAWN";
+
     #[test]
     fn txtautokey() {
-        let plaintext = "ATTACK AT DAWN";
         let ciphertxt = "QNXEPV YT WTWP";
         let autovig = AutoKey::new(&ENGLISH, "QUEENLY", false).unwrap();
-        assert_eq!(autovig.encrypt(&plaintext), ciphertxt);
-        assert_eq!(autovig.decrypt(&ciphertxt), plaintext);
+        assert_eq!(autovig.encrypt(&STRATEGY), ciphertxt);
+        assert_eq!(autovig.decrypt(&ciphertxt), STRATEGY);
     }
 
     #[test]
     fn keyautokey() {
-        let plaintext = "ATTACK AT DAWN";
         let ciphertxt = "QNXEPV YJ QXAC";
         let autovig = AutoKey::new(&ENGLISH, "QUEENLY", true).unwrap();
-        assert_eq!(autovig.encrypt(&plaintext), ciphertxt);
-        assert_eq!(autovig.decrypt(&ciphertxt), plaintext);
+        assert_eq!(autovig.encrypt(&STRATEGY), ciphertxt);
+        assert_eq!(autovig.decrypt(&ciphertxt), STRATEGY);
     }
 }

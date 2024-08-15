@@ -12,7 +12,7 @@ impl Vigenere {
         if !keystream.chars().all(|c| alphabet.contains(c)) {
             return Err(String::from("Keyword contains invalid characters!"));
         }
-        Ok(Vigenere {
+        Ok(Self {
             alphabet: alphabet.to_string(),
             keystream: keystream.to_string(),
             beaufort: false,
@@ -66,35 +66,31 @@ mod tests {
     use super::*;
     use crate::common::{ENGLISH, KRYPTOS};
 
+    const K1_PLAIN: &str = "BETWEEN SUBTLE SHADING AND THE ABSENCE OF LIGHT";
+    const K2_PLAIN: &str = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?";
+
     #[test]
     fn kryptos_k1() {
-        let plaintext = "BETWEENSUBTLESHADINGANDTHEABSENCEOFLIGHT";
-        let ciphertxt = "EMUFPHZLRFAXYUSDJKZLDKRNSHGNFIVJYQTQUXQB";
+        let ciphertxt = "EMUFPHZ LRFAXY USDJKZL DKR NSH GNFIVJY QT QUXQB";
         let vigenere = Vigenere::new(&KRYPTOS, "PALIMPSEST").unwrap();
-        assert_eq!(vigenere.encrypt(plaintext), ciphertxt);
-        assert_eq!(vigenere.decrypt(ciphertxt), plaintext);
+        assert_eq!(vigenere.encrypt(K1_PLAIN), ciphertxt);
+        assert_eq!(vigenere.decrypt(ciphertxt), K1_PLAIN);
     }
 
     #[test]
     fn kryptos_k2() {
-        let plaintext = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?";
-        let ciphertxt = "VFPJUDEEHZWETZYVGWHKKQETGFQJNCEGGWHKK?";
+        let ciphertxt = "VF PJU DEEHZWE TZYVGWHKK QETG FQJN CEGGWHKK ?";
         let vigenere = Vigenere::new(&KRYPTOS, "ABSCISSA").unwrap();
-        let encrypted = vigenere.encrypt(plaintext);
-        assert_eq!(encrypted.replace(" ", ""), ciphertxt);
-        let decrypted = vigenere.decrypt(ciphertxt);
-        assert_eq!(decrypted, plaintext.replace(" ", ""));
+        assert_eq!(vigenere.encrypt(K2_PLAIN), ciphertxt);
+        assert_eq!(vigenere.decrypt(ciphertxt), K2_PLAIN);
     }
 
     #[test]
     fn variant() {
-        let plaintext = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?";
-        let ciphertxt = "BVLXLXZWKCENKGJBZAYBVBZJZVBXIWZZZAYBV?";
+        let ciphertxt = "BV LXL XZWKCEN KGJBZAYBV BZJZ VBXI WZZZAYBV ?";
         let vigenere = Vigenere::new(&KRYPTOS, "ABSCISSA").unwrap();
-        let encrypted = vigenere.decrypt(plaintext);
-        assert_eq!(encrypted.replace(" ", ""), ciphertxt);
-        let decrypted = vigenere.encrypt(ciphertxt);
-        assert_eq!(decrypted.replace(" ", ""), plaintext.replace(" ", ""));
+        assert_eq!(vigenere.decrypt(K2_PLAIN), ciphertxt);
+        assert_eq!(vigenere.encrypt(ciphertxt), K2_PLAIN);
     }
 
     #[test]
@@ -102,9 +98,7 @@ mod tests {
         let plaintext = "IT WAS GIOVANNI VESTRI";
         let ciphertxt = "XYENKCKRWAAPAXBZHWU";
         let beaufort = Vigenere::new_beaufort(&ENGLISH, "FRANCIS").unwrap();
-        let encrypted = beaufort.encrypt(plaintext);
-        assert_eq!(encrypted.replace(" ", ""), ciphertxt);
-        let decrypted = beaufort.decrypt(ciphertxt);
-        assert_eq!(decrypted, plaintext.replace(" ", ""));
+        assert_eq!(beaufort.encrypt(plaintext).replace(" ", ""), ciphertxt);
+        assert_eq!(beaufort.decrypt(ciphertxt), plaintext.replace(" ", ""));
     }
 }

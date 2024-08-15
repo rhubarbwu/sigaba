@@ -19,7 +19,7 @@ impl Affine {
             Err(_) => (1, 1),
         };
 
-        Ok(Affine {
+        Ok(Self {
             alphabet: alphabet.to_string(),
             alphalen: len,
             factor,
@@ -28,13 +28,13 @@ impl Affine {
         })
     }
     pub fn new_atbash(alphabet: &str) -> Result<Self, String> {
-        Affine::new(alphabet, -1, -1)
+        Self::new(alphabet, -1, -1)
     }
     pub fn new_caesar(alphabet: &str, shift: i32) -> Result<Self, String> {
-        Affine::new(alphabet, 1, shift)
+        Self::new(alphabet, 1, shift)
     }
     pub fn new_rot13() -> Result<Self, String> {
-        Affine::new(&ENGLISH, 1, 13)
+        Self::new(&ENGLISH, 1, 13)
     }
 
     fn substitute(&self, text: &str, decrypt: bool) -> String {
