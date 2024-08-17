@@ -26,10 +26,11 @@
 
 ### Transposition
 
-- [ ] Scytale (c. 400 BC)
-- [ ] Columnar (c. 1880)
+- [x] Scytale (c. 400 BC)
+- [x] Columnar (c. 1880)
 - [ ] Grille (c. 19th century)
 - [ ] Rail Fence (c. 19th century)
+- [ ] Myszkowski (c. 1902)
 - [ ] Route (c. 20th century)
 
 ### Vigenère

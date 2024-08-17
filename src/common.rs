@@ -20,6 +20,9 @@ pub fn refill(input: &str, template: &str, alphabet: &str) -> String {
             }
         }
     }
+    if i < input.len() {
+        output.push_str(&input[i..]);
+    }
     output
 }
 
@@ -45,3 +48,18 @@ pub trait Cipher {
     fn encrypt(&self, plaintext: &str) -> String;
     fn decrypt(&self, ciphertxt: &str) -> String;
 }
+
+pub fn char_index(input: &str, alphabet: &str) -> Vec<u32> {
+    input
+        .chars()
+        .filter_map(|c| alphabet.chars().position(|x| x == c).map(|pos| pos as u32))
+        .collect()
+}
+
+pub fn alphabetize(indices: Vec<u32>, alphabet: &str) -> String {
+    indices
+        .iter()
+        .filter_map(|&i| alphabet.chars().nth(i as usize))
+        .collect()
+}
+
