@@ -11,11 +11,11 @@ pub fn refill(input: &str, template: &str, alphabet: &str) -> String {
     let mut output = String::with_capacity(template.len());
     let (input, mut i) = (input.to_string(), 0);
     for j in 0..template.len() {
-        if let Some(c) = template.chars().nth(j) {
-            if !alphabet.contains(c) {
-                output.push(c);
-            } else if let Some(c) = input.chars().nth(i) {
-                output.push(c);
+        if let Some(c0) = template.chars().nth(j) {
+            if !alphabet.contains(c0) {
+                output.push(c0);
+            } else if let Some(c1) = input.chars().nth(i) {
+                output.push(c1);
                 i += 1;
             }
         }
@@ -29,7 +29,6 @@ pub fn refill(input: &str, template: &str, alphabet: &str) -> String {
 pub fn check_unique(alphabet: &str) -> Result<(), String> {
     let char_set: HashSet<char> = alphabet.chars().collect();
     if char_set.len() != alphabet.chars().count() {
-        println!("{}", alphabet.len());
         return Err(String::from("Duplicate characters found in alphabet!"));
     }
     Ok(())
@@ -62,4 +61,3 @@ pub fn alphabetize(indices: Vec<u32>, alphabet: &str) -> String {
         .filter_map(|&i| alphabet.chars().nth(i as usize))
         .collect()
 }
-

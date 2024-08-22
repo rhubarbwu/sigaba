@@ -8,6 +8,7 @@
 - [ ] Playfair (c. 1854)
 - [ ] Nihilist (c. 19th century)
 - [ ] Book (c. 19th century)
+- [ ] Bifid (c. 1901)
 - [ ] One-Time Pad (c. 1917)
 - [ ] Hill (c. 1929)
 - [ ] Four Square (c. 20th century)
@@ -26,6 +27,7 @@
 
 ### Transposition
 
+- [x] Rotation (c. ?)
 - [x] Scytale (c. 400 BC)
 - [x] Columnar (c. 1880)
 - [ ] Grille (c. 19th century)

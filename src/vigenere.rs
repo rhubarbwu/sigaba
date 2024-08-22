@@ -59,31 +59,33 @@ mod tests {
     use super::*;
     use crate::common::{ENGLISH, KRYPTOS};
 
-    const K1_PLAIN: &str = "BETWEEN SUBTLE SHADING AND THE ABSENCE OF LIGHT";
-    const K2_PLAIN: &str = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?";
+    const K1_PLAIN: &str = include_str!("kryptos/k1_plain.txt");
+    const K2_PLAIN: &str = include_str!("kryptos/k2_plain.txt");
 
     #[test]
     fn kryptos_k1() {
-        let ciphertxt = "EMUFPHZ LRFAXY USDJKZL DKR NSH GNFIVJY QT QUXQB";
+        let plaintext = K1_PLAIN.replace("\n", "").replace(" ", "");
+        let ciphertxt = include_str!("kryptos/k1_cipher.txt").replace("\n", "");
         let vigenere = Vigenere::new(&KRYPTOS, "PALIMPSEST").unwrap();
-        assert_eq!(vigenere.encrypt(K1_PLAIN), ciphertxt);
-        assert_eq!(vigenere.decrypt(ciphertxt), K1_PLAIN);
+        assert_eq!(vigenere.encrypt(&plaintext), ciphertxt);
+        assert_eq!(vigenere.decrypt(&ciphertxt), plaintext);
     }
 
     #[test]
     fn kryptos_k2() {
-        let ciphertxt = "VF PJU DEEHZWE TZYVGWHKK QETG FQJN CEGGWHKK ?";
+        let plaintext = K2_PLAIN.replace("\n", "").replace(" ", "");
+        let ciphertxt = include_str!("kryptos/k2_cipher.txt").replace("\n", "");
         let vigenere = Vigenere::new(&KRYPTOS, "ABSCISSA").unwrap();
-        assert_eq!(vigenere.encrypt(K2_PLAIN), ciphertxt);
-        assert_eq!(vigenere.decrypt(ciphertxt), K2_PLAIN);
+        assert_eq!(vigenere.encrypt(&plaintext), ciphertxt);
+        assert_eq!(vigenere.decrypt(&ciphertxt), plaintext);
     }
 
     #[test]
     fn variant() {
         let ciphertxt = "BV LXL XZWKCEN KGJBZAYBV BZJZ VBXI WZZZAYBV ?";
         let vigenere = Vigenere::new(&KRYPTOS, "ABSCISSA").unwrap();
-        assert_eq!(vigenere.decrypt(K2_PLAIN), ciphertxt);
-        assert_eq!(vigenere.encrypt(ciphertxt), K2_PLAIN);
+        assert_eq!(vigenere.decrypt(K2_PLAIN)[..ciphertxt.len()], *ciphertxt);
+        assert_eq!(vigenere.encrypt(ciphertxt), K2_PLAIN[..ciphertxt.len()]);
     }
 
     #[test]
