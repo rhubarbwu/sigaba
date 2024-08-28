@@ -241,21 +241,22 @@ mod tests {
         let ciphertxt = include_str!("kryptos/k3_cipher.txt").replace("\n", "");
 
         // ENCRYPT
-        let rotated_8x42 = Transpose::as_left(&KRYPTOS, 8, false)
-            .unwrap()
-            .encrypt(&plaintext);
-        let rotated_24x14 = Transpose::as_left(&KRYPTOS, 24, false)
-            .unwrap()
-            .encrypt(&rotated_8x42);
+        let left8 = Transpose::as_left(&KRYPTOS, 8, false).unwrap();
+        let left24 = Transpose::as_left(&KRYPTOS, 24, false).unwrap();
+        let rotated_8x42 = left8.encrypt(&plaintext);
+        let rotated_24x14 = left24.encrypt(&rotated_8x42);
         assert_eq!(rotated_24x14.replace(" ", ""), ciphertxt.replace(" ", ""));
 
         // DECRYPT
-        let rotated_14x24 = Transpose::as_right(&KRYPTOS, 14, false)
-            .unwrap()
-            .encrypt(&ciphertxt);
-        let rotated_42x8 = Transpose::as_right(&KRYPTOS, 42, false)
-            .unwrap()
-            .encrypt(&rotated_14x24);
+        let rotated_14x24 = left24.decrypt(&ciphertxt);
+        let rotated_42x8 = left8.decrypt(&rotated_14x24);
+        assert_eq!(rotated_42x8.replace(" ", ""), plaintext.replace(" ", ""));
+
+        // INVERSE ENCRYPT = DECRYPT
+        let right14 = Transpose::as_right(&KRYPTOS, 14, false).unwrap();
+        let right42 = Transpose::as_right(&KRYPTOS, 42, false).unwrap();
+        let rotated_14x24 = right14.encrypt(&ciphertxt);
+        let rotated_42x8 = right42.encrypt(&rotated_14x24);
         assert_eq!(rotated_42x8.replace(" ", ""), plaintext.replace(" ", ""));
     }
 }

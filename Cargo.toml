@@ -4,5 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+clap = { version = "4.5.16", features = ["derive"] }
 ndarray = "0.16.1"
 rand = "0.8.4"
+
+[lib]
+name = "sigaba"
+path = "src/lib.rs"
+
+[[bin]]
+name = "sigaba"
+path = "src/bin.rs"
